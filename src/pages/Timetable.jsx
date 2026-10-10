@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import {
   CalendarDays,
@@ -103,7 +103,7 @@ function getAnonTopic(iso) {
 function getLadyLiveInfo(iso) {
   if (iso === '2026-10-07') {
     return { hasLive: true, hasHmahon: false, slots: [
-      { time: '21.00 - 22.30', title: '🔴 LIVE! ครูเลดี้เก๋ VIP: แหกโค้ง ครูผู้ช่วยภาค ก [กลุ่ม VIP เลดี้เก๋เก๋]', note: 'เก็งข้อสอบน่าจะออก สพฐ. รอบทั่วไป 69 — ปักหมุดกลุ่มหน้า 1 ตารางแดง wolf (จันทร์ 7 ต.ค. ตรงรูป!)', done: false, _link: LADY_POST_PINNED_URL, _linkExternal: true },
+      { time: '21.00 - 22.30', title: '🔴 LIVE! ครูเลดี้เก๋ VIP: แหกโค้ง ครูผู้ช่วยภาค ก [กลุ่ม VIP เลดี้เก๋เก๋]', note: 'เก็งข้อสอบน่าจะออก สพฐ. รอบทั่วไป 69 — ปักหมุดกลุ่มหน้า 1 ตารางแดง wolf (วันพุธ 7 ต.ค. 2569)', done: false, _link: LADY_POST_PINNED_URL, _linkExternal: true },
       { time: '22.30 - 00.00', title: '🔴 LIVE! ครูเลดี้เก๋ VIP: วิชาเอกภาษาอังกฤษ ภาค ข [กลุ่ม VIP เลดี้เก๋เก๋]', note: 'วิชาเอกอังกฤษ — ตามคำสั่ง "เลดี้เก๋เก๋คนเดียวพอ" ห้ามพลาด!', done: false, _link: LADY_POST_PINNED_URL, _linkExternal: true }
     ]}
   }
@@ -145,7 +145,7 @@ const LADY_VOD_QUEUE = {
   '2026-10-21': { cat: '🔥 หมาหอนสำคัญ', title: '🔥 หมาหอนอังคาร ครั้งที่ 2 (ภาคก ภาษาอังกฤษ 65-68) — คืนนี้มี LIVE เลดี้ 21.00+', link: 'https://www.facebook.com/share/v/1AHuH4tK4B/' },
   '2026-10-22': { cat: '🩷 P1 วิชาเอก ภาคข', title: '[Ep8.9] เก็งปี 69 วิชาเอกอังกฤษ Part 9 (ก่อนหมาหอน 28 ต.ค.)', link: 'https://www.facebook.com/share/v/1CM8ZDiAtD/' },
   '2026-10-23': { cat: '🩷 P1 วิชาเอก ภาคข + 🔥หมาหอน', title: '[Ep8.10] สรุป 155 ข้อสุดท้าย + 🔥 หมาหอนศุกร์ ครั้งที่ 2 (สมัครวันที่5 ระวัง!)', link: 'https://www.facebook.com/share/v/14NzszfJDSa/' },
-  // 24-25 ต.ค. = ยื่นสมัครสอบ HARD RULE → SKIP VOD
+  // ช่วงสมัครสอบตามกำหนดการที่หน้าเว็บอ้างอิง: ลดเวลา VOD และเผื่อเวลาตรวจเอกสาร
   '2026-10-26': { cat: '🩵 P1 รอง ภาคก อังกฤษ', title: '[Ep9.1] แหกโค้งภาคก อังกฤษ เก็งปี 69 (ล่าสุด 26 ก.ย. 69)', link: 'https://www.facebook.com/share/v/1F1niimQ2j/' },
   '2026-10-27': { cat: '🩵 P1 รอง + 🔥หมาหอน', title: '[ภาคก Ep8.1] + 🔥 หมาหอนอังคาร ครั้งที่ 3 (ภาคก 65-68)', link: 'https://www.facebook.com/share/v/1BDMWPbLYE/' },
   // 28 ต.ค. = LIVE เลดี้ 19.00-00.00 (หมาหอน3ชม.+แหกโค้ง+วิชาเอก) → VOD บ่าย หมาหอนอังคาร 4
@@ -193,7 +193,7 @@ function defaultSlotsForWeekday(weekday, iso) {
     slots.push({ id: nextId(), time: '11.15 - 12.15', zone: 'เช้า', title: 'P4: Quiz 1 ชุด (50-60 ข้อ) — เก็บคะแนนใน Dashboard', note: 'ดู % Trend Graph สีฟ้า — เป้าหมายเฉลี่ย ≥ 75% (สู้ๆ)', done: false })
     const ladyVod = getLadyVodForToday(iso)
     if (iso === '2026-10-12') {
-      slots.push({ id: nextId(), time: '13.30 - 15.00', zone: 'บ่าย', title: 'P3: วิเคราะห์เขตที่เปิดภาษาอังกฤษ (❗ ประกาศเขตวันนี้!)', note: 'เลือก 3-5 เขตสำรอง — เปิด Info.jsx Scoring Matrix', done: false })
+      slots.push({ id: nextId(), time: '13.30 - 15.00', zone: 'บ่าย', title: 'P3: ตรวจประกาศอัตรารับสมัคร (ถ้ามี)', note: 'เปรียบเทียบเฉพาะคุณสมบัติและจำนวนอัตราที่หน่วยงานประกาศอย่างเป็นทางการ', done: false })
     } else if (iso >= '2026-10-20' && iso <= '2026-10-23') {
       slots.push({ id: nextId(), time: '13.30 - 14.30', zone: 'บ่าย', title: 'P5: ภาค ค ประวัติ+ผลงาน 1 ชม. (มีคนช่วยทำ)', note: 'Portfolio + ใบประกาศนียบัตรจัดหมวด', done: false })
       if (ladyVod) slots.push({ id: nextId(), time: '14.45 - 15.45', zone: 'บ่าย', title: `${ladyVod.cat} ${ladyVod.title}`, note: '1 ชม. VOD เลยนะ — ถ้าไม่หมด คืนต่อ', done: false, _link: ladyVod.link, _linkExternal: true })
@@ -228,29 +228,29 @@ function defaultSlotsForWeekday(weekday, iso) {
       time: '20.00 - 21.00',
       zone: 'คืน',
       title: `🔴 [P1 รอง] LIVE อ.นนท์ VIP (1 ชม.แรก): ${anonTopic}  [จากนั้นสลับ!]`,
-      note: '⚠️ จำกัด 1 ชม.เท่านั้น! 21.00 ต้องสลับไปฟัง LIVE เลดี้เก๋ (วิชาเอกอังกฤษ) ทันที — ส่วนอ.นนท์ 21.00-22.00 ดูย้อนหลังวันรุ่งขึ้น (ช่วงเช้า 10.00+) ไม่ต้องกดวันไหนกันหมดเลย คลิปมีเสมอ!',
+      note: 'ปรับเวลาเรียนให้เหมาะกับตัวเอง ตรวจตารางถ่ายทอดสดและคลิปย้อนหลังจากกลุ่มผู้เผยแพร่โดยตรง',
       done: false,
       _link: ANON_ANNOUNCEMENTS_URL,
       _linkExternal: true
     })
     // ทุก LIVE slot ของเลดี้เก๋ 21.00+ push ตรงๆ (getLadyLiveInfo() คืนค่ามาแล้ว พร้อม _link ทุกอัน)
     for (const s of ladyInfo.slots) {
-      slots.push({ ...s, id: nextId(), title: '🔴 [P1 สูงสุด! วิชาเอกอังกฤษ] ' + s.title.replace('🔴 LIVE! ',''), note: (s.note || '') + ' | ⭐⭐⭐ ห้ามพลาดเด็ดขาด! ตรงคำสั่ง User: "อย่าตัดวิชาเอกผมออก"' })
+      slots.push({ ...s, id: nextId(), title: '🔴 [วิชาเอกอังกฤษ] ' + s.title.replace('🔴 LIVE! ',''), note: (s.note || '') + ' | ตรวจประกาศล่าสุดจากผู้เผยแพร่ก่อนรับชม' })
     }
   } else if (!isMockOrRest) {
     slots.push({
       id: nextId(),
       time: '20.00 - 22.00',
       zone: 'คืน',
-      title: `🔴 [P1 สูงสุด] LIVE อ.นนท์ VIP: ${anonTopic} [คอร์สรับรองผล]`,
-      note: '⭐⭐⭐ วันนี้ไม่มี LIVE เลดี้เก๋ → ฟังอ.นนท์เต็ม 2 ชม. (ถ้าเนื้อหาซ้ำ ข้ามได้ ไปนอนพัก) → คลิก Badge ด้านล่าง ไปตรง Announcements รายวัน',
+      title: `🔴 LIVE อ.นนท์ VIP: ${anonTopic}`,
+      note: 'กำหนดการนี้เป็นรายการอ้างอิง ตรวจวันเวลาและลิงก์ประกาศจากกลุ่มผู้เผยแพร่ก่อนรับชม',
       done: false,
       _link: ANON_ANNOUNCEMENTS_URL,
       _linkExternal: true
     })
   }
 
-  // Slots พิเศษ HARD RULE / Mock / สมัครสอบ / เขต
+  // Slots พิเศษสำหรับ Mock, การสมัคร และการทบทวนก่อนสอบ
   if (iso === '2026-11-07') {
     return [
       { id: nextId(), time: '08.00 - 10.30', zone: 'เช้า', title: '🔥 Mock Final #1 — ภาค ก (200 คะแนน) จับเวลา 2.5 ชม.', note: 'ห้ามหยุด! เหมือนสอบจริงที่สุด', done: false },
@@ -279,32 +279,32 @@ function defaultSlotsForWeekday(weekday, iso) {
     return [
       { id: nextId(), time: '09.00 - 10.00', zone: 'เช้า', title: '🧘 พักผ่อน — อ่าน Notebook จุดผิดเบาๆ 1 หน้า', note: 'ห้ามอ่านหนังสือหนัก! หัวร้อนวันสอบไม่ดี', done: false },
       { id: nextId(), time: '13.00 - 14.00', zone: 'กลางวัน', title: 'ตรวจสอบเอกสารวันสอบ: บัตร ปชช. + ใบสมัคร + ปากกา 2 ด้าม', note: 'ห้ามลืม!', done: false },
-      { id: nextId(), time: '21.00 - 22.00', zone: 'คืน', title: '😴 นอนเต็ม 8 ชั่วโมง! ตื่นเช้าวันสอบ 06.00', note: 'โชคดี! ปีนี้บรรจุแน่นอน 💪', done: false }
+      { id: nextId(), time: '21.00 - 22.00', zone: 'คืน', title: '😴 พักผ่อนและเตรียมตัวสำหรับวันสอบ', note: 'เตรียมเอกสารที่จำเป็น พักผ่อนให้เพียงพอ และยึดเกณฑ์ประเมินของหน่วยงาน', done: false }
     ]
   }
 
   if (iso >= '2026-10-20' && iso <= '2026-10-23' && weekday >= 1 && weekday <= 4) {
-    const add = { id: `s${Date.now()}_reg`, time: '15.00 - 15.30', zone: 'กลางวัน', title: '📝 เช็คสถานะสมัครสอบ 30 นาที (เท่านั้น!)', note: 'เช็คอีเมล์ + แจ้งเตือนจากระบบ — แต่ ⚠️ HARD RULE ห้ามกดยื่นสมัคร! รอ 24 ต.ค. ดูยอดคนสมัครก่อน', done: false }
+    const add = { id: `s${Date.now()}_reg`, time: '15.00 - 15.30', zone: 'กลางวัน', title: '📝 ตรวจเอกสารและสถานะใบสมัคร', note: 'ตรวจคุณสมบัติ เอกสาร และประกาศจากหน่วยงาน หากข้อมูลพร้อมให้ดำเนินการภายในกำหนด ไม่ควรรอจนวันสุดท้าย', done: false }
     if (slots.length >= 2) slots.splice(2, 0, add)
     else slots.push(add)
   }
-  if (iso === '2026-10-19' && weekday === 0) {
-    slots.unshift({ id: nextId(), time: '17.30 - 18.00', zone: 'บ่าย', title: '📝 เปิดสมัครสอบวันแรก! (เช็ค Server 30 นาที)', note: '⚠️ HARD RULE ห้ามยื่นสมัครวันนี้! แค่ทดสอบลิ้งก์มีอยู่จริง — ยื่นรอ 24 ต.ค.', done: false })
+  if (iso === '2026-10-19') {
+    slots.unshift({ id: nextId(), time: '17.30 - 18.00', zone: 'บ่าย', title: '📝 ตรวจประกาศและเตรียมยื่นสมัคร', note: 'ยืนยันวันและเวลารับสมัครจากประกาศทางการ ตรวจข้อมูลและเอกสารให้ครบ และยื่นภายในกำหนดโดยไม่รอวันท้าย', done: false })
   }
 
   if (iso === '2026-10-12') {
     slots.unshift(
-      { id: nextId(), time: '08.00 - 09.30', zone: 'เช้า', title: '❗❗ ประกาศเขต 246 แห่ง — วิเคราะห์ 1.5 ชม. (วันจันทร์ 12 ต.ค. ปิดเทอมอยู่!)', note: 'เปิด Info.jsx ดู Scoring Matrix ใหม่ + kruphuchuay.com ดูภาษาอังกฤษอัตราไหนเปิด → บันทึก 3-5 เขตสำรอง', done: false },
+      { id: nextId(), time: '08.00 - 09.30', zone: 'เช้า', title: 'ตรวจประกาศรับสมัครและอัตราที่หน่วยงานเผยแพร่', note: 'เปิดอ่านประกาศต้นทาง หากยังไม่มีประกาศให้รอข้อมูลยืนยัน ไม่ใช้ตัวเลขคาดการณ์แทนจำนวนอัตราจริง', done: false },
       { id: nextId(), time: '09.45 - 12.00', zone: 'เช้า', title: 'P1: Mock ปี 67 ภาค ก (200 คะแนน) — ทำครึ่งแรก 2 ชม.15 นาที', note: 'วันจันทร์ 12 ต.ค. ปิดเทอมอยู่! ไม่ต้องไปสอน (ระบบ schoolOpen ผิดเดิม ตอนนี้ถูกแล้ว!)', done: false }
     )
   }
 
   if (iso === '2026-10-24') {
     return [
-      { id: nextId(), time: '08.00 - 09.30', zone: 'เช้า', title: '👑 HARD RULE #1: ดูยอดคนสมัครวันที่ 6 ของช่วงสมัคร', note: 'เปิดระบบสมัครสอบ → ดูจำนวนผู้สมัครต่อ 1 ตำแหน่ง ทุกเขตที่เปิดอังกฤษ → บันทึกลง Dashboard Widget อัตราแข่ง', done: false },
-      { id: nextId(), time: '09.45 - 11.15', zone: 'เช้า', title: '⚖️ เปรียบเทียบ 3 เขตสุดท้าย', note: 'อ้างอิง Info.jsx Scoring Matrix → อันดับ #1 #2 #3 (HARD RULE: พิษณุโลก 2 ถ้า ≥1:60 ห้ามยื่น!)', done: false },
-      { id: nextId(), time: '13.30 - 14.30', zone: 'กลางวัน', title: '✅ ยื่นสมัครสอบออนไลน์ เขตที่ดีที่สุด', note: 'เตรียมรูป ใบ ปชช. + ใบเกรด + วุฒิ + รูปถ่าย + เงินสมัคร', done: false },
-      { id: nextId(), time: '15.00 - 16.00', zone: 'บ่าย', title: '💾 Save PDF ใบสมัคร + Send email สำรอง 1 ชั่วโมง', note: 'เช็ค 2 รอบ: อีเมล์ + SMS ยืนยันการชำระเงิน → Done!', done: false },
+      { id: nextId(), time: '08.00 - 09.30', zone: 'เช้า', title: 'ตรวจยอดผู้สมัครในระบบ (ถ้ามีข้อมูลแสดง)', note: 'บันทึกจำนวนผู้สมัครและเวลาที่ตรวจไว้เป็นข้อมูลประกอบ ไม่ใช่การคาดการณ์โอกาสสอบติด', done: false },
+      { id: nextId(), time: '09.45 - 11.15', zone: 'เช้า', title: 'ทบทวนคุณสมบัติและประกาศของเขตที่สนใจ', note: 'เทียบคุณสมบัติ เอกสาร อัตราที่ประกาศ และความพร้อมส่วนตัว โดยยึดข้อมูลจากหน่วยงานต้นทาง', done: false },
+      { id: nextId(), time: '13.30 - 14.30', zone: 'กลางวัน', title: 'ยื่นหรือยืนยันใบสมัครภายในกำหนด', note: 'ตรวจความถูกต้องของข้อมูลและเอกสารก่อนส่ง ไม่ควรรอจนใกล้ปิดระบบ', done: false },
+      { id: nextId(), time: '15.00 - 16.00', zone: 'บ่าย', title: 'บันทึกหลักฐานและตรวจสถานะใบสมัคร', note: 'ดาวน์โหลด/เก็บหลักฐานการส่ง และตรวจสถานะตามช่องทางที่ประกาศระบุ', done: false },
       { id: nextId(), time: '20.00 - 21.00', zone: 'คืน', title: `🔴 [P1 รอง] LIVE อ.นนท์ VIP (1 ชม.แรก): ${getAnonTopic(iso)}  [จากนั้นสลับ!]`, note: '24 ต.ค. = วันเสาร์ LIVE เลดี้ 21.00+ ด้วย! → สลับ 21.00 ไปฟังวิชาเอก เลดี้เก๋ ต่อเนื่อง', done: false, _link: ANON_ANNOUNCEMENTS_URL, _linkExternal: true },
       ...(ladyInfo.hasLive ? ladyInfo.slots.map(s => ({ ...s, id: nextId(), title: '🔴 [P1 สูงสุด! วิชาเอก] ' + s.title.replace('🔴 LIVE! ',''), note: (s.note || '') + ' | สมัครเสร็จสบายใจ! ฟังวิชาเอก ให้เต็มที่ 21.00+' })) : [])
     ]
@@ -312,8 +312,8 @@ function defaultSlotsForWeekday(weekday, iso) {
 
   if (iso === '2026-10-25') {
     return [
-      { id: nextId(), time: '09.00 - 10.00', zone: 'เช้า', title: '🔍 เช็คสถานะการสมัครสอบอีกครั้ง (รอบสุดท้าย)', note: 'ถ้ายังไม่ได้ยื่น → ดูยอดคนสมัครรอบสุดท้ายอีกครั้ง → ยื่นเขตที่ดีที่สุดทันที!', done: false },
-      { id: nextId(), time: '14.00 - 15.00', zone: 'บ่าย', title: '⏳ ตรวจสอบอีเมล์ + SMS ยืนยันรอบสุดท้าย 1 ชม.', note: '🚫 Server ปิด 18.00 น.! ถ้ายังไม่ได้รับ → โทร. สพฐ. ด่วน', done: false },
+      { id: nextId(), time: '09.00 - 10.00', zone: 'เช้า', title: '🔍 ตรวจสถานะการสมัครและหลักฐาน', note: 'ยืนยันการส่งใบสมัครและเก็บหลักฐาน หากพบปัญหาให้ติดต่อหน่วยงานตามช่องทางในประกาศ', done: false },
+      { id: nextId(), time: '14.00 - 15.00', zone: 'บ่าย', title: '⏳ ตรวจอีเมลและข้อความยืนยัน', note: 'ยึดวันและเวลาปิดรับสมัครตามประกาศ ไม่ควรรอแก้ปัญหาจนใกล้เวลาปิดระบบ', done: false },
       { id: nextId(), time: '20.00 - 22.00', zone: 'คืน', title: `🔴 [P1] LIVE อ.นนท์ VIP: ${getAnonTopic(iso)} + พักใจ 2 ชม.`, note: 'สมัครเสร็จแล้ว! ไม่ต้องเที่ยว กลับมาติวต่อ → ไปนอนเร็วหลัง 22.00', done: false, _link: ANON_ANNOUNCEMENTS_URL, _linkExternal: true }
     ]
   }
@@ -361,6 +361,23 @@ export default function Timetable() {
   const [tt, setTt] = useLocalStorage('daily_timetable_v8', seedTimetable)
   const [addMode, setAddMode] = useState(null)
   const [newSlot, setNewSlot] = useState({ time: '', zone: 'คืน', title: '', note: '', _link: '', _linkExternal: false })
+
+  useEffect(() => {
+    setTt(previous => {
+      let changed = false
+      const next = previous.map(day => {
+        if (day.date < '2026-10-19' || day.date > '2026-10-25') return day
+        const slots = day.slots.map(slot => {
+          const content = `${slot.title || ''} ${slot.note || ''}`
+          if (!/^s\d+(?:_reg)?$/.test(String(slot.id)) || !/HARD RULE|ห้ามกดยื่นสมัคร|ยื่นรอ 24 ต\.ค\.|รอ 24 ต\.ค\.|Server ปิด 18\.00|ถ้ายังไม่ได้ยื่น/.test(content)) return slot
+          changed = true
+          return { ...slot, title: 'ตรวจเอกสารและสถานะใบสมัคร', note: 'ยึดประกาศและเวลารับสมัครจากหน่วยงาน ตรวจข้อมูลให้ครบและยื่นภายในกำหนด ไม่ควรรอจนวันสุดท้าย' }
+        })
+        return slots === day.slots ? day : { ...day, slots }
+      })
+      return changed ? next : previous
+    })
+  }, [setTt])
 
   const toggleSlot = (dayId, slotId) => {
     setTt(prev => prev.map(d => d.id === dayId
@@ -417,10 +434,10 @@ export default function Timetable() {
         <div>
           <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
             <CalendarDays className="w-6 h-6 text-primary-600" />
-            ตารางติวรายวัน (ตามเวลาไลฟ์สดจริง 2 กลุ่ม VIP)
+            ตารางติวรายวัน
           </h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            🔴 LIVE = ห้ามพลาดสูงสุด! P1 อ.นนท์ 20.00 ทุกคืน + เลดี้เก๋ ตามวันไลฟ์สด (จ 7 ต.ค. / อ 21,28 ต.ค. / อ 4,11 พ.ย.)
+            ตารางนี้เป็นแผนส่วนตัว ลิงก์และเวลาไลฟ์อาจเปลี่ยน โปรดตรวจประกาศจากผู้จัดก่อนรับชม
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm">

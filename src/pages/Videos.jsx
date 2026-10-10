@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   PlayCircle,
   CalendarDays,
@@ -49,6 +49,19 @@ export default function Videos() {
     note: ''
   })
 
+  useEffect(() => {
+    setVideos(previous => {
+      let changed = false
+      const next = previous.map(video => {
+        const legacySeed = ['anon-vip', 'lady-vip-group'].includes(video.id) && /VIP รับรองผล|คอร์สหลักวิชาเอกอังกฤษ 100%|P1 รอง! VIP|P1 สูงสุด! \(ตามคำสั่ง/.test(video.note || '')
+        if (!legacySeed) return video
+        changed = true
+        return { ...video, isLive: false, note: 'ตรวจตารางไลฟ์และประกาศล่าสุดจากเจ้าของกลุ่มก่อนรับชม' }
+      })
+      return changed ? next : previous
+    })
+  }, [setVideos])
+
   const categories = ['ทั้งหมด', ...Array.from(new Set(videos.map(v => v.category)))]
 
   const filtered = filter === 'ทั้งหมด' ? videos : videos.filter(v => v.category === filter)
@@ -59,10 +72,6 @@ export default function Videos() {
 
   const toggleWatched = (id) => {
     setVideos(prev => prev.map(v => v.id === id ? { ...v, isWatched: !v.isWatched } : v))
-  }
-
-  const updateSchedule = (id, value) => {
-    setVideos(prev => prev.map(v => v.id === id ? { ...v, schedule: value } : v))
   }
 
   const updateNote = (id, value) => {
@@ -114,7 +123,7 @@ export default function Videos() {
             วีดีโอติว + ไลฟ์สด
           </h2>
           <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            คลิกวีดีโอเพื่อดูในหน้าเว็บได้เลย ไม่ต้องเปิดแท็บใหม่! เพิ่มลิ้งค์คอร์สของคุณเองได้
+            วิดีโอที่รองรับจะฝังในหน้าเว็บได้ ส่วนกลุ่ม Facebook ต้องเปิดจากลิงก์และตรวจเวลาไลฟ์กับผู้เผยแพร่
           </p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
