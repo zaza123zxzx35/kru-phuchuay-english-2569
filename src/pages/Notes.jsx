@@ -6,7 +6,6 @@ import {
   Edit3,
   Trash2,
   Save,
-  X,
   BookOpen
 } from 'lucide-react'
 import { useLocalStorage } from '../hooks/useLocalStorage'

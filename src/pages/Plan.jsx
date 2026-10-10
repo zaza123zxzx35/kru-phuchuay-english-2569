@@ -9,6 +9,7 @@ import {
   Save
 } from 'lucide-react'
 import { useLocalStorage } from '../hooks/useLocalStorage'
+import { useExamCountdown } from '../hooks/useExamCountdown'
 import { initialStudyPlan, initialMockExams } from '../data/planData'
 
 const colorCls = {
@@ -45,6 +46,7 @@ const colorCls = {
 }
 
 export default function Plan() {
+  const countdown = useExamCountdown()
   const [plan, setPlan] = useLocalStorage('study_plan', initialStudyPlan)
   const [progress, setProgress] = useLocalStorage('plan_progress', {})
   const [mockExams, setMockExams] = useLocalStorage('mock_exams', initialMockExams)
@@ -117,7 +119,7 @@ export default function Plan() {
           <div>
             <h2 className="text-xl font-bold text-gray-800 dark:text-slate-200 flex items-center gap-2">
               <Target className="w-6 h-6 text-primary-600" />
-              แผนการอ่านรายวัน - เหลืออีก 39 วัน
+              แผนการอ่านรายวัน · {countdown.isPast ? 'ถึงกำหนดสอบแล้ว' : `เหลืออีก ${countdown.days} วัน`}
             </h2>
             <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
               คลิกที่วงกลมเพื่อทำเครื่องหมาย "ทำแล้ว" — ระบบจะบันทึกโดยอัตโนมัติ
@@ -166,8 +168,7 @@ export default function Plan() {
                     </div>
                     <p className={`text-sm ${c.text} mt-0.5`}>{p.subtitle}</p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-600 dark:text-slate-400">
-                      <span>เป้าหมาย: <strong>{p.targetScore}</strong></span>
-                      <span>คะแนนปี 68: <strong>{Object.values(p.lastScore || {}).join(', ')}</strong></span>
+                      <span>เป้าหมายส่วนตัว: <strong>{p.targetScore}</strong></span>
                     </div>
                   </div>
                 </div>

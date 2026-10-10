@@ -27,6 +27,15 @@ export default function Quiz() {
     questions: [{ q: '', options: ['', '', '', ''], answer: 0, explanation: '' }]
   })
 
+  const categories = useMemo(() => {
+    const map = {}
+    quizzes.forEach(quiz => {
+      if (!map[quiz.category]) map[quiz.category] = []
+      map[quiz.category].push(quiz)
+    })
+    return map
+  }, [quizzes])
+
   const startQuiz = (q) => {
     setActiveQuiz(q)
     setAnswers({})
@@ -260,15 +269,6 @@ export default function Quiz() {
   }
 
   // List View
-  const categories = useMemo(() => {
-    const map = {}
-    quizzes.forEach(q => {
-      if (!map[q.category]) map[q.category] = []
-      map[q.category].push(q)
-    })
-    return map
-  }, [quizzes])
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-3">
